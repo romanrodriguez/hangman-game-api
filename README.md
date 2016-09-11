@@ -154,3 +154,4 @@ According to its [Wikipedia link](https://en.wikipedia.org/wiki/Hangman_(game)),
     ## Additional Resources:
     - [Checked code for PEP8 requirements](http://pep8online.com/)
     - [Hangman Game Wikipedia Page](https://en.wikipedia.org/wiki/Hangman_(game)
+    - http://localhost:8080/_ah/api/explorer
