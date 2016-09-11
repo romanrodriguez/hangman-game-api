@@ -1,0 +1,17 @@
+Designing a Hangman Game API
+
+- I used the Wikipedia link to the Hangman Game to make sure I knew the basic functionality that I would have to implement in the app in terms of rules, inputs and outputs. I went with all the standards, such as providing the player with 9 attempts before losing, or winning if guessing the word before that.
+
+- After that, I explored the sample project provided to have a better idea of the architecture of the app and layed out on paper where I thought I needed to make changes.
+
+- I tested the endpoints with the API explorer to make sure everything was working correctly. I had to debug a local issue on my computer that was caused by having the previous installation of GAE on my computer, and now moving to the recommended command line tools. My .bash_profile had been modified with the previous installation, and I had to delete the entries manually.
+
+- The sample code provides a robust skeleton on which to build on and it does not differ much from what is needed to build the Hangman Game. It mostly needs some additions and a few slight changes to the existing code to make it work.
+
+- This implementation stores more data than the skeleton, including forms on users that store their victories and loses and allows to perform operations on a historical basis to evaluate which players are best and have played the most.
+
+- The functionality of the game is restricted to the classic game. It could be developed further to include more complex interactions with and of gamers, and add all sorts of entertaining ways to make the game more interesting.
+
+- Adapting the game to fit Google Datastore is perhaps the biggest challenge, as it can make certain iterations more complicated than it would be otherwise using a different type of database.
+
+
