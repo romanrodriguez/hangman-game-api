@@ -4,11 +4,11 @@ Designing a Hangman Game API
 
 - After that, I explored the sample project provided to have a better idea of the architecture of the app and layed out on paper where I thought I needed to make changes.
 
-- I tested the endpoints with the API explorer to make sure everything was working correctly. I had to debug a local issue on my computer that was caused by having the previous installation of GAE on my computer, and now moving to the recommended command line tools. My .bash_profile had been modified with the previous installation, and I had to delete the entries manually.
+- I tested the endpoints with the API explorer to make sure everything was working correctly. I had to debug a local issue on my computer that was caused by having the previous installation of the GAE application, and now moving to the recommended command line tools. My .bash_profile had been modified with the previous installation, and I had to delete the entries manually.
 
 - The sample code provides a robust skeleton on which to build on and it does not differ much from what is needed to build the Hangman Game. It mostly needs some additions and a few slight changes to the existing code to make it work.
 
-- This implementation stores more data than the skeleton, including forms on users that store their victories and loses and allows to perform operations on a historical basis to evaluate which players are best and have played the most.
+- This implementation stores more data than the skeleton, including forms on users that store their victories and loses and allows to perform operations on a historical basis to evaluate which players are best and have played the most. The cron job has been improved to bug users less and only emails them if they still have an active game going.
 
 - The functionality of the game is restricted to the classic game. It could be developed further to include more complex interactions with and of gamers, and add all sorts of entertaining ways to make the game more interesting.
 
