@@ -118,7 +118,7 @@ class HangmanGameApi(remote.Service):
                       path='user/games',
                       name='get_user_games',
                       http_method='GET')
-    def get_games(self, request):
+    def get_user_games(self, request):
         """Return all games"""
         user = User.query(User.name == request.user_name).get()
         if not user:
