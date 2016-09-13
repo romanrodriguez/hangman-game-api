@@ -205,7 +205,7 @@ class HangmanGameApi(remote.Service):
                       http_method='GET')
     def get_user_rankings(self, request):
         """Return user_rankings on victory percentages"""
-        users = User.query(User.total_played > 0).fetch()
+        users = User.query(User.games_played > 0).fetch()
         users = sorted(users, key=lambda x: x.victory_percentage, reverse=True)
         return UserForms(items=[user.to_form() for user in users])
 
