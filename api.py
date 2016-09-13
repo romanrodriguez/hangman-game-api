@@ -52,7 +52,11 @@ class HangmanGameApi(remote.Service):
             raise endpoints.ConflictException(
                 'A User with that name already exists!')
         user = User(name=request.user_name, email=request.email)
-        """use regex to check email validity"""
+        """
+        Use regex to check email validity. 
+        Could add sending activation emails instead, as it is common practice
+        and a more secure and standard way nowadays.
+        """
         match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]'
                          '+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', request.email)
         if match is None:
@@ -120,7 +124,7 @@ class HangmanGameApi(remote.Service):
         if not user:
             raise endpoints.NotFoundException('User not found')
         games = Game.query(Game.user == user.key).\
-            filter(Game.game_over is False)
+            filter(Game.game_over == False)
         return GameForms(items=[game.to_form("game on") for game in games])
 
     @endpoints.method(request_message=GET_GAME_REQUEST,
@@ -191,7 +195,7 @@ class HangmanGameApi(remote.Service):
                       http_method='GET')
     def get_high_scores(self, request):
         """Return scores from highest"""
-        Scores = Score.query(Score.won is True).order(Score.guesses).fetch(
+        Scores = Score.query(Score.won == True).order(Score.guesses).fetch(
             request.results)
         return ScoreForms(items=[score.to_form() for score in Scores])
 
