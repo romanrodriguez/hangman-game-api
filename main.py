@@ -13,14 +13,16 @@ from models import Game
 
 
 class SendReminderEmail(webapp2.RequestHandler):
+
     def get(self):
         """Send a reminder email to each User with an email about games.
         Called every thursday at 17:00 using a cron job"""
         app_id = app_identity.get_application_id()
         users = User.query(User.email != None)
         for user in users:
-            active_games = Game.query(Game.user == user.key).filter(Game.game_over == False)
-            if active_games: # send them an email.
+            active_games = Game.query(Game.user == user.key).filter(
+                Game.game_over == False)
+            if active_games:  # send them an email.
                 subject = 'This is a reminder!'
                 body = 'Hello {}, try out Guess A Number!'.format(user.name)
                 # This will send test emails, the arguments to send_mail are:
@@ -32,6 +34,7 @@ class SendReminderEmail(webapp2.RequestHandler):
 
 
 class UpdateAverageMovesRemaining(webapp2.RequestHandler):
+
     def post(self):
         """Update game listing announcement in memcache."""
         HangmanGameApi._cache_average_attempts()

@@ -22,14 +22,14 @@ from utils import get_by_urlsafe
 
 NEW_GAME_REQUEST = endpoints.ResourceContainer(NewGameForm)
 GET_GAME_REQUEST = endpoints.ResourceContainer(
-        urlsafe_game_key=messages.StringField(1),)
+    urlsafe_game_key=messages.StringField(1),)
 MAKE_MOVE_REQUEST = endpoints.ResourceContainer(
     MakeMoveForm,
     urlsafe_game_key=messages.StringField(1),)
 USER_REQUEST = endpoints.ResourceContainer(user_name=messages.StringField(1),
                                            email=messages.StringField(2))
 GET_HIGH_SCORES_REQUEST = endpoints.ResourceContainer(
-  results=messages.IntegerField(1))
+    results=messages.IntegerField(1))
 
 MEMCACHE_MOVES_REMAINING = 'MOVES_REMAINING'
 
@@ -46,7 +46,7 @@ class HangmanGameApi(remote.Service):
         """Create a User. Requires a unique username"""
         if User.query(User.name == request.user_name).get():
             raise endpoints.ConflictException(
-                    'A User with that name already exists!')
+                'A User with that name already exists!')
         user = User(name=request.user_name, email=request.email)
         """use regex to check email validity"""
         match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]'
@@ -56,7 +56,7 @@ class HangmanGameApi(remote.Service):
             raise ValueError('Not an email')
         user.put()
         return StringMessage(message='User {} created!'.format(
-                request.user_name))
+            request.user_name))
 
     @endpoints.method(request_message=NEW_GAME_REQUEST,
                       response_message=GameForm,
@@ -68,7 +68,7 @@ class HangmanGameApi(remote.Service):
         user = User.query(User.name == request.user_name).get()
         if not user:
             raise endpoints.NotFoundException(
-                    'A User with that name does not exist!')
+                'A User with that name does not exist!')
         try:
             game = Game.new_game(user.key, 9)
         except ValueError:
@@ -211,7 +211,7 @@ class HangmanGameApi(remote.Service):
         user = User.query(User.name == request.user_name).get()
         if not user:
             raise endpoints.NotFoundException(
-                    'A User with that name does not exist!')
+                'A User with that name does not exist!')
         scores = Score.query(Score.user == user.key)
         return ScoreForms(items=[score.to_form() for score in scores])
 
@@ -232,7 +232,7 @@ class HangmanGameApi(remote.Service):
             count = len(games)
             total_attempts_remaining = sum([game.attempts_remaining
                                             for game in games])
-            average = float(total_attempts_remaining)/count
+            average = float(total_attempts_remaining) / count
             memcache.set(MEMCACHE_MOVES_REMAINING,
                          'Average moves remaining is {:.2f}'.format(average))
 
