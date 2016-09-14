@@ -44,7 +44,15 @@ class User(ndb.Model):
 
 
 class Game(ndb.Model):
-    """Game object"""
+    """
+    Game object includes the registered user,
+    the word to be guessed,
+    the letter attempts towards guessing the word,
+    the number of attempts allowed,
+    the count of attempts already tried,
+    a game over property in case the attempts allowed are surpased,
+    and a history one to keep record of all the attempts.
+    """
     user = ndb.KeyProperty(required=True, kind='User')
     guess_word = ndb.StringProperty(required=True)
     letter_attempts = ndb.StringProperty(required=True, default='')
@@ -134,7 +142,7 @@ class NewGameForm(messages.Message):
 
 class MakeMoveForm(messages.Message):
     """Used to make a move in an existing game"""
-    guess = messages.IntegerField(1, required=True)
+    guess = messages.StringField(1, required=True)
 
 
 class ScoreForm(messages.Message):
