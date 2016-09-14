@@ -153,8 +153,10 @@ class HangmanGameApi(remote.Service):
     def make_move(self, request):
         """Makes a move. Returns a game state with message"""
         game = get_by_urlsafe(request.urlsafe_game_key, Game)
+        # Test if game is already over
         if game.game_over:
-            return game.to_form('Game already over!')
+            raise endpoints.ForbiddenException(
+                'Illegal action: Game is already over.')
         if request.guess in game.letter_attempts:
             """check if letter has not already been chosen"""
             raise endpoints.BadRequestException('Already said that letter')
