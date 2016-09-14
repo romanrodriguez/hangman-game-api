@@ -33,10 +33,10 @@ According to its [Wikipedia link](https://en.wikipedia.org/wiki/Hangman_(game)),
  - **create_user**
     - Path: 'user'
     - Method: POST
-    - Parameters: user_name, email (optional)
+    - Parameters: user_name, email (required)
     - Returns: Message confirming creation of the User.
     - Description: Creates a new User. user_name provided must be unique. Will 
-    raise a ConflictException if a User with that user_name already exists.
+    raise a ConflictException if a User with that user_name already exists, or if User doesn't provide an email address.
     
  - **new_game**
     - Path: 'game'

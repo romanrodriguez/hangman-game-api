@@ -60,8 +60,8 @@ class HangmanGameApi(remote.Service):
         match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]'
                          '+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', request.email)
         if match is None:
-            print('invalid email address')
-            raise ValueError('Not an email')
+            raise endpoints.ConflictException(
+                'That is not a valid email! Please enter a correct email address.')
         user.put()
         return StringMessage(message='User {} created!'.format(
             request.user_name))
