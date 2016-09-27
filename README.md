@@ -7,12 +7,12 @@
 
 
 ## Game Description:
-This Hangman game is intended to be played by a single user who needs to guess a word provided by the game's API. The API provides a set of secret words that will be chosen at random for the player to guess in each game. The API methods are described in more detail below.
+This Hangman game is intended to be played by a single user who needs to guess a word provided by the game's API. The API provides a set of secret words that will be chosen at random for the player to guess in each game. The API methods are described in more detail below. The player can either guess the word in full or letter by letter. Each wrong attempt will count towards a maximum number of attempts. If the player doesn't guess the entire word before hitting that number of attempts, the player loses. Otherwise, the player wins the game.
 
-For score-keeping, the guesses by the player get recorded in `letter_attempts`, and for recording games, the property `history` is used.
+For score-keeping, the guesses by the player get recorded in `letter_attempts`, and for recording games, the property `history` is used. Players are ranked by number of wins and loses.
 
 To play, we first need to create a new user, using the `create_user` endpoint.
-Use `create_game` to create a game. Remember to copy the `urlsafe_key` property for later use. With `make_move` you'll be able to make sure the player avids to the game's rules. Below, you can find more information about other endpoints you can/should use and they are also commented in the code.
+Use `create_game` to create a game. Remember to copy the `urlsafe_key` property for later use. With `make_move` you'll be able to make sure the player avids to the game's rules. Below, you can find more information about other endpoints you can/ should use and they are also commented in the code.
 
 
 ## Set-Up Instructions:
