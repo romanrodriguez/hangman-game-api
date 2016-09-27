@@ -20,7 +20,7 @@ from models import (
     ScoreForms,
     GameForms,
     UserForm,
-    UserForms,
+    UserForms
 )
 from utils import get_by_urlsafe
 
