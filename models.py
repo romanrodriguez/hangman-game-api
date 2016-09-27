@@ -18,7 +18,7 @@ class User(ndb.Model):
     """field that gets calculated with players' victories and losses"""
     @property
     def victory_percentage(self):
-        if self.total_played > 0:
+        if self.games_played > 0:
             return float(self.victories) / float(self.games_played)
         else:
             return 0
