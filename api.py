@@ -53,7 +53,7 @@ class HangmanGameApi(remote.Service):
                 'A User with that name already exists!')
         user = User(name=request.user_name, email=request.email)
         """
-        Use regex to check email validity. 
+        Use regex to check email validity.
         Could add sending activation emails instead, as it is common practice
         and a more secure and standard way nowadays.
         """
@@ -61,7 +61,7 @@ class HangmanGameApi(remote.Service):
                          '+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', request.email)
         if match is None:
             raise endpoints.ConflictException(
-                'That is not a valid email! Please enter a correct email address.')
+                'Not a valid email! Please enter a correct email address.')
         user.put()
         return StringMessage(message='User {} created!'.format(
             request.user_name))
@@ -157,17 +157,24 @@ class HangmanGameApi(remote.Service):
         if game.game_over:
             raise endpoints.ForbiddenException(
                 'Illegal action: Game is already over.')
-        if request.guess in game.letter_attempts:
-            """check if letter has not already been chosen"""
-            raise endpoints.BadRequestException('Already said that letter')
+        for request.guess in game.letter_attempts:
+            """Check if letter has not already been chosen"""
+            if guess != guess.isalpha():
+                raise endpoints.ForbiddenException(
+                    'You can only type alphabetic characters.')
+            if guess == word:
+                game.end_game(True)
+                return game.to_form('You guessed the word! You win!')
+            if len(guess) != len(word) or 1:
+                raise endpoints.ForbiddenException(
+                    'Only provide one letter or a word that contains the same amount of characters as the word required.')
+            if guess in game.letter_attempts:
+                raise endpoints.ForbiddenException('Already said that letter')
         game.letter_attempts += request.guess
         failed = 0
         for char in game.guess_word:
             if char not in game.letter_attempts:
                 failed += 1
-            if failed == 0:
-                game.end_game(True)
-                return game.to_form('You guessed the word!')
             if request.guess in game.guess_word:
                 msg = 'Your letter is in the word. Keep going.'
                 game.history.append((request.guess, "found"))
