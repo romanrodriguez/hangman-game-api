@@ -159,5 +159,5 @@ Use `create_game` to create a game. Remember to copy the `urlsafe_key` property 
 
     ## Additional Resources:
     - [Checked code for PEP8 requirements](http://pep8online.com/)
-    - [Hangman Game Wikipedia Page](https://en.wikipedia.org/wiki/Hangman_(game)
+    - https://en.wikipedia.org/wiki/Hangman_(game)
     - http://localhost:8080/_ah/api/explorer
