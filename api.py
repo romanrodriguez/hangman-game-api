@@ -159,16 +159,16 @@ class HangmanGameApi(remote.Service):
                 'Illegal action: Game is already over.')
         for request.guess in game.letter_attempts:
             """Check if letter has not already been chosen"""
-            if guess != guess.isalpha():
+            if not request.guess.isalpha():
                 raise endpoints.ForbiddenException(
                     'You can only type alphabetic characters.')
-            if guess == word:
+            if request.guess == game.guess_word:
                 game.end_game(True)
                 return game.to_form('You guessed the word! You win!')
-            if len(guess) != len(word) or 1:
+            if len(request.guess) != len(game.guess_word) or 1:
                 raise endpoints.ForbiddenException(
                     'Only provide one letter or a word that contains the same amount of characters as the word required.')
-            if guess in game.letter_attempts:
+            if request.guess in game.letter_attempts:
                 raise endpoints.ForbiddenException('Already said that letter')
         game.letter_attempts += request.guess
         failed = 0
