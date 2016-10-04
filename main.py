@@ -24,7 +24,7 @@ class SendReminderEmail(webapp2.RequestHandler):
                 Game.game_over == False)
             if active_games:  # send them an email.
                 subject = 'This is a reminder!'
-                body = 'Hello {}, try out Guess A Number!'.format(user.name)
+                body = 'Hello {}, try out Hangman again!'.format(user.name)
                 # This will send test emails, the arguments to send_mail are:
                 # from, to, subject, body
                 mail.send_mail('noreply@{}.appspotmail.com'.format(app_id),
