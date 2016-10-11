@@ -29,7 +29,7 @@ class User(ndb.Model):
                         email=self.email,
                         victories=self.victories,
                         games_played=self.games_played,
-                        win_percentage=self.victory_percentage)
+                        victory_percentage=self.victory_percentage)
 
     def add_victory(self):
         """store a player's victory"""
