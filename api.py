@@ -136,15 +136,14 @@ class HangmanGameApi(remote.Service):
     def cancel_game(self, request):
         """ Remove and end game that is under way"""
         game = get_by_urlsafe(request.urlsafe_game_key, Game)
-        if game and not game.game_over:
-            game.key.delete()
-            return StringMessage(message='Game id key:{} removed'.format(
-                request.urlsafe_game_key))
-        elif game and game.game_over:
+        if not game:
+            raise endpoints.NotFoundException('Game not found!')
+        if game.game_over:
             raise endpoints.BadRequestException(
                 'You cannot delete completed games')
-        else:
-            raise endpoints.NotFoundException('Game not found!')
+
+        game.key.delete()
+        return StringMessage(message='Game id key:{} removed'.format(request.urlsafe_game_key))
 
     @endpoints.method(request_message=MAKE_MOVE_REQUEST,
                       response_message=GameForm,
