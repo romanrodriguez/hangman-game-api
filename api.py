@@ -1,17 +1,17 @@
-# -*- coding: utf-8 -*-`
-"""api.py - Create and configure the Game API exposing the resources.
-This can also contain game logic. For more complex games it would be wise to
-move game logic to another file. Ideally the API will be simple, concerned
-primarily with communication to/from the API's users."""
+"""Hangman API built on Google Cloud Endpoints."""
 
 import re
 import endpoints
-
 from protorpc import remote, messages
-from google.appengine.api import memcache
-from google.appengine.api import taskqueue
-
-from models import User, Game, Score
+from google.appengine.api import (
+    memcache,
+    taskqueue,
+)
+from models import (
+    User,
+    Game,
+    Score,
+)
 from models import (
     StringMessage,
     NewGameForm,
@@ -19,19 +19,20 @@ from models import (
     MakeMoveForm,
     ScoreForms,
     GameForms,
-    UserForm,
-    UserForms
+    UserForms,
 )
 from utils import get_by_urlsafe
 
-NEW_GAME_REQUEST = endpoints.ResourceContainer(NewGameForm)
+NEW_GAME_REQUEST = endpoints.ResourceContainer(
+    NewGameForm)
 GET_GAME_REQUEST = endpoints.ResourceContainer(
     urlsafe_game_key=messages.StringField(1),)
 MAKE_MOVE_REQUEST = endpoints.ResourceContainer(
     MakeMoveForm,
     urlsafe_game_key=messages.StringField(1),)
-USER_REQUEST = endpoints.ResourceContainer(user_name=messages.StringField(1),
-                                           email=messages.StringField(2))
+USER_REQUEST = endpoints.ResourceContainer(
+    user_name=messages.StringField(1),
+    email=messages.StringField(2))
 GET_HIGH_SCORES_REQUEST = endpoints.ResourceContainer(
     results=messages.IntegerField(1))
 
