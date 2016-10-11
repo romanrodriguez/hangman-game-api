@@ -76,8 +76,8 @@ class Game(ndb.Model):
                     guess_word=guess_word,
                     letter_attempts='',
                     history=[],
-                    attempts_allowed=attempts,
-                    attempts_remaining=attempts,
+                    attempts_allowed=9,
+                    attempts_remaining=9,
                     game_over=False)
         game.put()
         return game
