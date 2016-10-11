@@ -157,36 +157,32 @@ class HangmanGameApi(remote.Service):
         if game.game_over:
             raise endpoints.ForbiddenException(
                 'Illegal action: Game is already over.')
-        for request.guess in game.letter_attempts:
-            """Check if letter has not already been chosen"""
-            if not request.guess.isalpha():
-                raise endpoints.ForbiddenException(
-                    'You can only type alphabetic characters.')
-            if request.guess == game.guess_word:
-                game.end_game(True)
-                return game.to_form('You guessed the word! You win!')
-            if len(request.guess) != len(game.guess_word) or 1:
-                raise endpoints.ForbiddenException(
-                    'Only provide one letter or a word that contains the same amount of characters as the word required.')
-            if request.guess in game.letter_attempts:
-                raise endpoints.ForbiddenException('Already said that letter')
+        if not request.guess.isalpha():
+            raise endpoints.ForbiddenException(
+                'You can only type alphabetic characters.')
+        if request.guess in game.letter_attempts:
+            raise endpoints.ForbiddenException('Already said that letter.')
+        if request.guess == game.guess_word:
+            game.end_game(True)
+            return game.to_form('You guessed the word! You win!')
+        elif len(request.guess) != 1:
+            raise endpoints.ForbiddenException(
+                'Only provide one letter at a time or the entire exact word.')
+
         game.letter_attempts += request.guess
-        failed = 0
-        for char in game.guess_word:
-            if char not in game.letter_attempts:
-                failed += 1
-            if request.guess in game.guess_word:
-                msg = 'Your letter is in the word. Keep going.'
-                game.history.append((request.guess, "found"))
-            else:
-                game.attempts_remaining -= 1
-                game.history.append((request.guess, "not found"))
-                msg = 'Your letter is NOT in the word. Keep trying.'
-            if game.attempts_remaining == 0:
-                game.end_game(False)
-                return game.to_form(msg + ' Game over!')
-            else:
-                game.put()
+
+        if request.guess not in game.guess_word:
+            game.attempts_remaining -= 1
+            game.history.append((request.guess, "not found"))
+            msg = 'Your letter is NOT in the word.'
+        if request.guess in game.guess_word:
+            msg = 'Your letter is in the word. Keep going.'
+            game.history.append((request.guess, "found"))
+        if game.attempts_remaining == 0:
+            game.end_game(True)
+            return game.to_form(msg + ' Game over!')
+        else:
+            game.put()
         return game.to_form(msg)
 
     @endpoints.method(response_message=ScoreForms,
