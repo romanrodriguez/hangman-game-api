@@ -12,7 +12,7 @@ This Hangman game is intended to be played by a single user who needs to guess a
 For score-keeping, the guesses by the player get recorded in `letter_attempts`, and for recording games, the property `history` is used. Players are ranked by number of wins and loses.
 
 To play, we first need to create a new user, using the `create_user` endpoint.
-Use `create_game` to create a game. Remember to copy the `urlsafe_key` property for later use. With `make_move` you'll be able to make sure the player avids to the game's rules. Below, you can find more information about other endpoints you can/ should use and they are also commented in the code.
+Use `new_game` to create a game. Remember to copy the `urlsafe_key` property for later use. With `make_move` you'll be able to make sure the player avids to the game's rules. Below, you can find more information about other endpoints you can/ should use and they are also commented in the code.
 
 
 ## Set-Up Instructions:
@@ -161,3 +161,15 @@ Use `create_game` to create a game. Remember to copy the `urlsafe_key` property 
     - [Checked code for PEP8 requirements](http://pep8online.com/)
     - https://en.wikipedia.org/wiki/Hangman_(game)
     - http://localhost:8080/_ah/api/explorer
+
+    ## Testing
+    To test this project I first export the path of Google App Engine to the directory that holds my project in it:
+    `export PATH=$PATH:/Users/Username/google_appengine/`
+
+    Then, I start the server to be able to browse the project locally by specifying its directory in the following command:
+    `dev_appserver.py DIR`
+
+    Last, to be able to test the API without browser issues, I run the following command, which opens a new Google Chrome window that allows the project to smoothly throughout the testing phase:
+   `/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome http://localhost:8080/_ah/api/explorer http://localhost:8000 --user-data-dir=test -allow-running-insecure-content --disable-extensions --no-first-run --no-default-browser-check`
+
+
