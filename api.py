@@ -179,7 +179,7 @@ class HangmanGameApi(remote.Service):
             msg = 'Your letter is in the word. Keep going.'
             game.history.append((request.guess, "found"))
         if game.attempts_remaining == 0:
-            game.end_game(True)
+            game.end_game()
             return game.to_form(msg + ' Game over!')
         else:
             game.put()
