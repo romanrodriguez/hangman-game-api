@@ -55,7 +55,10 @@ class Game(ndb.Model):
     """
     user = ndb.KeyProperty(required=True, kind='User')
     guess_word = ndb.StringProperty(required=True)
+    word_length = ndb.IntegerProperty(required=True)
     letter_attempts = ndb.StringProperty(required=True, default='')
+    letter_attempts_correct = ndb.StringProperty(required=True, default='')
+    letter_attempts_wrong = ndb.StringProperty(required=True, default='')
     attempts_allowed = ndb.IntegerProperty(required=True, default=9)
     attempts_remaining = ndb.IntegerProperty(required=True, default=9)
     game_over = ndb.BooleanProperty(required=True, default=False)
@@ -74,7 +77,10 @@ class Game(ndb.Model):
         """points the guess_word string to the word"""
         game = Game(user=user,
                     guess_word=guess_word,
+                    word_length=len(guess_word),
                     letter_attempts='',
+                    letter_attempts_correct='',
+                    letter_attempts_wrong='',
                     history=[],
                     attempts_allowed=9,
                     attempts_remaining=9,
@@ -88,6 +94,9 @@ class Game(ndb.Model):
         form.urlsafe_key = self.key.urlsafe()
         form.user_name = self.user.get().name
         form.letter_attempts = self.letter_attempts
+        form.letter_attempts_correct = self.letter_attempts_correct
+        form.letter_attempts_wrong = self.letter_attempts_wrong
+        form.word_length = self.word_length
         form.attempts_remaining = self.attempts_remaining
         form.game_over = self.game_over
         form.message = message
@@ -128,6 +137,9 @@ class GameForm(messages.Message):
     message = messages.StringField(4, required=True)
     user_name = messages.StringField(5, required=True)
     letter_attempts = messages.StringField(6, required=True)
+    letter_attempts_correct = messages.StringField(7, required=True)
+    letter_attempts_wrong = messages.StringField(8, required=True)
+    word_length = messages.IntegerField(9, required=True)
 
 
 class GameForms(messages.Message):

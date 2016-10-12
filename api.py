@@ -173,11 +173,16 @@ class HangmanGameApi(remote.Service):
 
         if request.guess not in game.guess_word:
             game.attempts_remaining -= 1
+            game.letter_attempts_wrong += request.guess
             game.history.append((request.guess, "not found"))
             msg = 'Your letter is NOT in the word.'
         if request.guess in game.guess_word:
-            msg = 'Your letter is in the word. Keep going.'
+            game.letter_attempts_correct += request.guess
             game.history.append((request.guess, "found"))
+            msg = 'Your letter is in the word. Keep going.'
+        if game.guess_word in game.letter_attempts_correct:
+            game.end_game(True)
+            return game.to_form('You guessed the word! You win!')
         if game.attempts_remaining == 0:
             game.end_game()
             return game.to_form(msg + ' Game over!')
