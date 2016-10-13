@@ -177,8 +177,7 @@ class HangmanGameApi(remote.Service):
             game.history.append((request.guess, "not found"))
             msg = 'Your letter is NOT in the word.'
         if request.guess in game.guess_word:
-            for request.guess in game.guess_word:
-                game.letter_attempts_correct += request.guess
+            game.letter_attempts_correct += request.guess
             game.history.append((request.guess, "found"))
             msg = 'Your letter is in the word. Keep going.'
         if game.guess_word in game.letter_attempts_correct:
