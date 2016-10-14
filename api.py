@@ -253,6 +253,7 @@ class HangmanGameApi(remote.Service):
         for user in users:
             items.append(RankingForm(user_name=user.name,
                                      score=wins_minus_losses_count(user)))
+        items = sorted(items, reverse=True)
         return items
 
     @endpoints.method(response_message=StringMessage,
