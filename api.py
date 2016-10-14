@@ -163,8 +163,7 @@ class HangmanGameApi(remote.Service):
         user = User.query(User.name == request.user_name).get()
         if not user:
             raise endpoints.NotFoundException('User not found')
-        games = Game.query(Game.user == user.key)
-        games = games.filter(Game.game_over == False)
+        games = Game.query(Game.user == user.key, Game.game_over == False)
         return GameForms(games=[game.to_form("game on") for game in games])
 
     @endpoints.method(request_message=GET_GAME_REQUEST,
