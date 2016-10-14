@@ -12,35 +12,6 @@ class User(ndb.Model):
     """User profile"""
     name = ndb.StringProperty(required=True)
     email = ndb.StringProperty()
-    victories = ndb.IntegerProperty(default=0)
-    games_played = ndb.IntegerProperty(default=0)
-
-    """field that gets calculated with players' victories and losses"""
-    @property
-    def victory_percentage(self):
-        if self.games_played > 0:
-            return float(self.victories) / float(self.games_played)
-        else:
-            return 0
-
-    def to_form(self):
-        """form for rankings table"""
-        return UserForm(name=self.name,
-                        email=self.email,
-                        victories=self.victories,
-                        games_played=self.games_played,
-                        victory_percentage=self.victory_percentage)
-
-    def add_victory(self):
-        """store a player's victory"""
-        self.victories += 1
-        self.games_played += 1
-        self.put()
-
-    def add_loss(self):
-        """store a player's loss"""
-        self.games_played += 1
-        self.put()
 
 
 class Game(ndb.Model):
@@ -111,10 +82,6 @@ class Game(ndb.Model):
         score = Score(user=self.user, date=date.today(), won=won,
                       guesses=self.attempts_allowed - self.attempts_remaining)
         score.put()
-        if won:
-            self.user.get().add_victory()
-        else:
-            self.user.get().add_loss()
 
 
 class Score(ndb.Model):
@@ -144,7 +111,7 @@ class GameForm(messages.Message):
 
 class GameForms(messages.Message):
     """Return multiple GameForms"""
-    items = messages.MessageField(GameForm, 1, repeated=True)
+    games = messages.MessageField(GameForm, 1, repeated=True)
 
 
 class NewGameForm(messages.Message):
@@ -175,15 +142,17 @@ class StringMessage(messages.Message):
     message = messages.StringField(1, required=True)
 
 
-class UserForm(messages.Message):
-    """UserForm"""
-    name = messages.StringField(1, required=True)
-    email = messages.StringField(2)
-    victories = messages.IntegerField(3, required=True)
-    games_played = messages.IntegerField(4, required=True)
-    victory_percentage = messages.FloatField(5, required=True)
+class HighScoreForm(messages.Message):
+    """Limit the number of high scores returned"""
+    number_of_results = messages.IntegerField(1, default=10)
 
 
-class UserForms(messages.Message):
-    """Return multiple UserForms """
-    items = messages.MessageField(UserForm, 1, repeated=True)
+class RankingForm(messages.Message):
+    """Used for user ranking and high scores"""
+    user_name = messages.StringField(1, required=True)
+    score = messages.IntegerField(2, required=True)
+
+
+class RankingForms(messages.Message):
+    """Return multiple Rankings"""
+    rankings = messages.MessageField(RankingForm, 1, repeated=True)
