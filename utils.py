@@ -3,6 +3,7 @@
 import logging
 from google.appengine.ext import ndb
 import endpoints
+from models import Score
 
 
 def get_by_urlsafe(urlsafe, model):
@@ -34,3 +35,18 @@ def get_by_urlsafe(urlsafe, model):
     if not isinstance(entity, model):
         raise ValueError('Incorrect Kind')
     return entity
+
+
+def wins_minus_losses_count(user):
+    """Calculates a user's score from games won or lost"""
+    scores = Score.query(Score.user == user.key)
+    count_wins = 0
+    count_losses = 0
+
+    for score in scores:
+        if (score.won == 'True'):
+            count_wins += 1
+        else:
+            count_losses += 1
+
+    return count_wins - count_losses
