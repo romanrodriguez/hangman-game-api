@@ -19,9 +19,15 @@ from models import (
     MakeMoveForm,
     ScoreForms,
     GameForms,
-    UserForms,
+    HighScoreForm,
+    RankingForm,
+    RankingForms,
 )
-from utils import get_by_urlsafe
+from utils import (
+    get_by_urlsafe,
+    wins_minus_losses_count,
+)
+
 
 NEW_GAME_REQUEST = endpoints.ResourceContainer(
     NewGameForm)
@@ -34,7 +40,7 @@ USER_REQUEST = endpoints.ResourceContainer(
     user_name=messages.StringField(1),
     email=messages.StringField(2))
 GET_HIGH_SCORES_REQUEST = endpoints.ResourceContainer(
-    results=messages.IntegerField(1))
+    HighScoreForm)
 
 MEMCACHE_MOVES_REMAINING = 'MOVES_REMAINING'
 
@@ -89,62 +95,6 @@ class HangmanGameApi(remote.Service):
         taskqueue.add(url='/tasks/cache_average_attempts')
         return game.to_form('Good luck playing this awesome Hangman game!')
 
-    @endpoints.method(request_message=GET_GAME_REQUEST,
-                      response_message=StringMessage,
-                      path='game/{urlsafe_game_key}/history',
-                      name='get_game_history',
-                      http_method='GET')
-    def get_game_history(self, request):
-        """Returns a game's history"""
-        game = get_by_urlsafe(request.urlsafe_game_key, Game)
-        if not game:
-            raise endpoints.NotFoundException('Game not found!')
-        return StringMessage(message=str(game.history))
-
-    @endpoints.method(request_message=GET_GAME_REQUEST,
-                      response_message=GameForm,
-                      path='game/{urlsafe_game_key}',
-                      name='get_game',
-                      http_method='GET')
-    def get_game(self, request):
-        """Return the current game state."""
-        game = get_by_urlsafe(request.urlsafe_game_key, Game)
-        if game:
-            return game.to_form('Guess another letter to move on.')
-        else:
-            raise endpoints.NotFoundException('Game not found!')
-
-    @endpoints.method(request_message=USER_REQUEST,
-                      response_message=GameForms,
-                      path='user/games',
-                      name='get_user_games',
-                      http_method='GET')
-    def get_user_games(self, request):
-        """Return all games"""
-        user = User.query(User.name == request.user_name).get()
-        if not user:
-            raise endpoints.NotFoundException('User not found')
-        games = Game.query(Game.user == user.key).\
-            filter(Game.game_over == False)
-        return GameForms(items=[game.to_form("game on") for game in games])
-
-    @endpoints.method(request_message=GET_GAME_REQUEST,
-                      response_message=StringMessage,
-                      path='game/{urlsafe_game_key}',
-                      name='cancel_game',
-                      http_method='DELETE')
-    def cancel_game(self, request):
-        """ Remove and end game that is under way"""
-        game = get_by_urlsafe(request.urlsafe_game_key, Game)
-        if not game:
-            raise endpoints.NotFoundException('Game not found!')
-        if game.game_over:
-            raise endpoints.BadRequestException(
-                'You cannot delete completed games')
-
-        game.key.delete()
-        return StringMessage(message='Game id key:{} removed'.format(request.urlsafe_game_key))
-
     @endpoints.method(request_message=MAKE_MOVE_REQUEST,
                       response_message=GameForm,
                       path='game/{urlsafe_game_key}',
@@ -190,6 +140,61 @@ class HangmanGameApi(remote.Service):
             game.put()
         return game.to_form(msg)
 
+    @endpoints.method(request_message=GET_GAME_REQUEST,
+                      response_message=GameForm,
+                      path='game/{urlsafe_game_key}',
+                      name='get_game',
+                      http_method='GET')
+    def get_game(self, request):
+        """Return the current game state."""
+        game = get_by_urlsafe(request.urlsafe_game_key, Game)
+        if game:
+            return game.to_form('Guess another letter to move on.')
+        else:
+            raise endpoints.NotFoundException('Game not found!')
+
+    @endpoints.method(request_message=USER_REQUEST,
+                      response_message=GameForms,
+                      path='user/games/',
+                      name='get_user_games',
+                      http_method='GET')
+    def get_user_games(self, request):
+        """Return all user's active games"""
+        user = User.query(User.name == request.user_name).get()
+        if not user:
+            raise endpoints.NotFoundException('User not found')
+        games = Game.query(Game.user == user.key)
+        games = games.filter(Game.game_over == False)
+        return GameForms(games=[game.to_form("game on") for game in games])
+
+    @endpoints.method(request_message=GET_GAME_REQUEST,
+                      response_message=StringMessage,
+                      path='game/{urlsafe_game_key}/history',
+                      name='get_game_history',
+                      http_method='GET')
+    def get_game_history(self, request):
+        """Returns a game's history - moves made until that point in time"""
+        game = get_by_urlsafe(request.urlsafe_game_key, Game)
+        if not game:
+            raise endpoints.NotFoundException('Game not found!')
+        return StringMessage(message='History:' + str(game.history))
+
+    @endpoints.method(request_message=GET_GAME_REQUEST,
+                      response_message=StringMessage,
+                      path='game/{urlsafe_game_key}',
+                      name='cancel_game',
+                      http_method='DELETE')
+    def cancel_game(self, request):
+        """ Remove and end game that is under way"""
+        game = get_by_urlsafe(request.urlsafe_game_key, Game)
+        if not game:
+            raise endpoints.NotFoundException('Game not found!')
+        if game.game_over:
+            raise endpoints.BadRequestException(
+                'You cannot delete completed games')
+        game.key.delete()
+        return StringMessage(message='Game id key:{} removed'.format(request.urlsafe_game_key))
+
     @endpoints.method(response_message=ScoreForms,
                       path='scores',
                       name='get_scores',
@@ -197,27 +202,6 @@ class HangmanGameApi(remote.Service):
     def get_scores(self, request):
         """Return all scores"""
         return ScoreForms(items=[score.to_form() for score in Score.query()])
-
-    @endpoints.method(request_message=GET_HIGH_SCORES_REQUEST,
-                      response_message=ScoreForms,
-                      path='high_scores',
-                      name='get_high_scores',
-                      http_method='GET')
-    def get_high_scores(self, request):
-        """Return scores from highest"""
-        Scores = Score.query(Score.won == True).order(Score.guesses).fetch(
-            request.results)
-        return ScoreForms(items=[score.to_form() for score in Scores])
-
-    @endpoints.method(response_message=UserForms,
-                      path='user/rankings',
-                      name='get_user_rankings',
-                      http_method='GET')
-    def get_user_rankings(self, request):
-        """Return user_rankings on victory percentages"""
-        users = User.query(User.games_played > 0).fetch().order("victories")
-        users = sorted(users, key=lambda x: x.victory_percentage, reverse=True)
-        return UserForms(items=[user.to_form() for user in users])
 
     @endpoints.method(request_message=USER_REQUEST,
                       response_message=ScoreForms,
@@ -232,6 +216,45 @@ class HangmanGameApi(remote.Service):
                 'A User with that name does not exist!')
         scores = Score.query(Score.user == user.key)
         return ScoreForms(items=[score.to_form() for score in scores])
+
+    @endpoints.method(request_message=GET_HIGH_SCORES_REQUEST,
+                      response_message=RankingForms,
+                      path='high_scores',
+                      name='get_high_scores',
+                      http_method='GET')
+    def get_high_scores(self, request):
+        """Return scores from highest - limits nr. of results to 10"""
+        scores = self.sort_rankings(self.calc_rankings())[
+            0:request.number_of_results]
+
+        return RankingForms(rankings=scores)
+
+    def sort_rankings(self, items):
+        """Sort rankings by score"""
+        for i in range(0, len(items)):
+            for j in range(1, len(items)):
+                if items[i].score < items[j].score:
+                    temp = items[i]
+                    items[i] = items[j]
+                    items[j] = temp
+        return items
+
+    @endpoints.method(response_message=RankingForms,
+                      path='user/rankings',
+                      name='get_user_rankings',
+                      http_method='GET')
+    def get_user_rankings(self, request):
+        """Return all user rankings"""
+        return RankingForms(rankings=self.calc_rankings())
+
+    def calc_rankings(self):
+        """Calculate each user's ranking"""
+        users = User.query()
+        items = []
+        for user in users:
+            items.append(RankingForm(user_name=user.name,
+                                     score=wins_minus_losses_count(user)))
+        return items
 
     @endpoints.method(response_message=StringMessage,
                       path='games/average_attempts',
