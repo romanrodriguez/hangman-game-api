@@ -151,7 +151,7 @@ class HangmanGameApi(remote.Service):
 
     @endpoints.method(request_message=USER_REQUEST,
                       response_message=GameForms,
-                      path='user/games/',
+                      path='user/games',
                       name='get_user_games',
                       http_method='GET')
     def get_user_games(self, request):
