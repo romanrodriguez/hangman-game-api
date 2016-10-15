@@ -19,3 +19,9 @@ indexes:
   properties:
   - name: won
   - name: guesses
+    direction: desc
+
+- kind: Score
+  properties:
+  - name: won
+  - name: guesses
