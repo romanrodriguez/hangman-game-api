@@ -30,7 +30,7 @@ Use `new_game` to create a game. Remember to copy the `urlsafe_key` property for
  - cron.yaml: Cronjob configuration.
  - main.py: Handler for taskqueue handler.
  - models.py: Entity and message definitions including helper methods.
- - utils.py: Helper function for retrieving ndb.Models by urlsafe Key string.
+ - utils.py: Helper function for retrieving ndb.Models by urlsafe Key string and Helper function to calculate player performance.
 
 
 ## Endpoints Included:
@@ -50,13 +50,14 @@ Use `new_game` to create a game. Remember to copy the `urlsafe_key` property for
     - Description: Creates a new Game. User_name provided must correspond to an
     existing user - will raise a NotFoundException if not. Also adds a task to a task queue to update the average moves remaining
     for active games.
-     
- - **get_game_history**
-    - Path: game/{urlsafe_game_key}/history
-    - Method: GET
-    - Parameters: urlsafe_game_key
-    - Returns: All moves performed in the game
-    - Description: Processes all historical data on games.
+ 
+  - **make_move**
+    - Path: 'game/{urlsafe_game_key}'
+    - Method: PUT
+    - Parameters: urlsafe_game_key, guess
+    - Returns: GameForm with new game state.
+    - Description: Accepts a 'guess' and returns the updated state of the game.
+    If this causes a game to end, a corresponding Score entity will be created.
 
  - **get_game**
     - Path: 'game/{urlsafe_game_key}'
@@ -71,6 +72,13 @@ Use `new_game` to create a game. Remember to copy the `urlsafe_key` property for
     - Parameters: user_name
     - Returns: All games from one user that are active and not finished
     - Description: Returns all of a User's active games.
+ 
+ - **get_game_history**
+    - Path: game/{urlsafe_game_key}/history
+    - Method: GET
+    - Parameters: urlsafe_game_key
+    - Returns: All moves performed in a game.
+    - Description: Processes all historical data on games.
 
  - **cancel_game**
     - Path: 'game/{urlsafe_game_key}',
@@ -79,14 +87,6 @@ Use `new_game` to create a game. Remember to copy the `urlsafe_key` property for
     - Returns: Games from a user that are active and not done
     - Description: Users can cancel a game in progress, yet completed games cannot be removed. 
 
- - **make_move**
-    - Path: 'game/{urlsafe_game_key}'
-    - Method: PUT
-    - Parameters: urlsafe_game_key, guess
-    - Returns: GameForm with new game state.
-    - Description: Accepts a 'guess' and returns the updated state of the game.
-    If this causes a game to end, a corresponding Score entity will be created.
-    
  - **get_scores**
     - Path: 'scores'
     - Method: GET
@@ -94,27 +94,27 @@ Use `new_game` to create a game. Remember to copy the `urlsafe_key` property for
     - Returns: ScoreForms.
     - Description: Returns all Scores in the database (unordered).
  
+  - **get_user_scores**
+    - Path: 'scores/user/{user_name}'
+    - Method: GET
+    - Parameters: user_name
+    - Returns: ScoreForms. 
+    - Description: Returns all Scores recorded by the provided player.
+    Will raise a NotFoundException if the User does not exist.
+
  - **get_high_scores**
     - Path: 'high_scores'
     - Method: GET
     - Parameters: Total number of records stored
-    - Returns: All scores ranked by wins on top and after by least amount of attempts to win.
-    - Description: Can tell who has won the most games and times players have tried to win.
+    - Returns: RankingForms. All scores ranked by performance.
+    - Description: Can tell who has won the most games.
 
  - **get_user_rankings**
     - Path: 'user/rankings'
     - Method: GET
     - Parameters: None 
-    - Returns: Players that have played games displayed by ranking (win ratio)
+    - Returns: Players that have played games displayed by ranking.
     - Description: Ranks the performance of each player.
-
- - **get_user_scores**
-    - Path: 'scores/user/{user_name}'
-    - Method: GET
-    - Parameters: user_name
-    - Returns: ScoreForms. 
-    - Description: Returns all Scores recorded by the provided player (unordered).
-    Will raise a NotFoundException if the User does not exist.
  
 - **get_average_attempts**
     - Path: 'games/average_attempts'
@@ -151,10 +151,12 @@ Use `new_game` to create a game. Remember to copy the `urlsafe_key` property for
     - Return multiple ScoreForms (items).
  - **StringMessage**
     - General purpose String container (message).
- - **UserForm**
-    - Outbound user identity form (name, email, victories, games_played, victory_percentage).
- - **UserForms**
-    - Return multiple UserForms (items).
+ - **HighScoreForm**
+    - Limit the number of high scores returned (number_of_results).
+ - **RankingForm**
+    - Used for user ranking and high scores (user_name, score).
+ - **RankingForm**
+    - Return multiple Rankings (rankings).
 
 
     ## Additional Resources:
@@ -169,7 +171,9 @@ Use `new_game` to create a game. Remember to copy the `urlsafe_key` property for
     Then, I start the server to be able to browse the project locally by specifying its directory in the following command:
     `dev_appserver.py DIR`
 
-    Last, to be able to test the API without browser issues, I run the following command, which opens a new Google Chrome window that allows the project to smoothly throughout the testing phase:
+    Last, to be able to test the API without browser issues, I run the following command, which opens a new Google Chrome window that allows the project to run smoothly throughout the testing phase (starts your browser with the API Explorer ready to go)(on a Mac):
    `/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome http://localhost:8080/_ah/api/explorer http://localhost:8000 --user-data-dir=test -allow-running-insecure-content --disable-extensions --no-first-run --no-default-browser-check`
 
+    To make it easier to test cronjobs and start over with a new database every time, you can start the appserver with some flags, like so:
+    `dev_appserver.py --dev_appserver_log_level=warning --clear_datastore=yes --enable_sendmail=yes --show_mail_body=yes"`
 
