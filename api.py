@@ -18,7 +18,6 @@ from models import (
     MakeMoveForm,
     ScoreForms,
     GameForms,
-    HighScoreForm,
     RankingForm,
     RankingForms,
 )
@@ -39,7 +38,8 @@ USER_REQUEST = endpoints.ResourceContainer(
     user_name=messages.StringField(1),
     email=messages.StringField(2))
 GET_HIGH_SCORES_REQUEST = endpoints.ResourceContainer(
-    HighScoreForm)
+    results=messages.IntegerField(1),
+    number_of_results=messages.IntegerField(2, default=8))
 
 MEMCACHE_MOVES_REMAINING = 'MOVES_REMAINING'
 
@@ -212,26 +212,15 @@ class HangmanGameApi(remote.Service):
         return ScoreForms(items=[score.to_form() for score in scores])
 
     @endpoints.method(request_message=GET_HIGH_SCORES_REQUEST,
-                      response_message=RankingForms,
+                      response_message=ScoreForms,
                       path='high_scores',
                       name='get_high_scores',
                       http_method='GET')
     def get_high_scores(self, request):
         """Return scores from highest - limits nr. of results to 10"""
-        scores = self.sort_rankings(self.calc_rankings())[
-            0:request.number_of_results]
-
-        return RankingForms(rankings=scores)
-
-    def sort_rankings(self, items):
-        """Sort rankings by score"""
-        for i in range(0, len(items)):
-            for j in range(1, len(items)):
-                if items[i].score < items[j].score:
-                    temp = items[i]
-                    items[i] = items[j]
-                    items[j] = temp
-        return items
+        Scores = Score.query(Score.won == True).order(Score.guesses).fetch(
+            request.results)[0:request.number_of_results]
+        return ScoreForms(items=[score.to_form() for score in Scores])
 
     @endpoints.method(response_message=RankingForms,
                       path='user/rankings',
