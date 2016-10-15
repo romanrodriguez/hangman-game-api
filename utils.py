@@ -44,7 +44,7 @@ def wins_minus_losses_count(user):
     count_losses = 0
 
     for score in scores:
-        if (score.won == 'True'):
+        if (score.won == True):
             count_wins += 1
         else:
             count_losses += 1
