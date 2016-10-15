@@ -105,8 +105,8 @@ Use `new_game` to create a game. Remember to copy the `urlsafe_key` property for
  - **get_high_scores**
     - Path: 'high_scores'
     - Method: GET
-    - Parameters: Total number of records stored
-    - Returns: RankingForms. All scores ranked by performance.
+    - Parameters: Total number of records stored, optional number_of_results
+    - Returns: ScoreForms. All scores ranked by performance.
     - Description: Can tell who has won the most games.
 
  - **get_user_rankings**
@@ -151,8 +151,6 @@ Use `new_game` to create a game. Remember to copy the `urlsafe_key` property for
     - Return multiple ScoreForms (items).
  - **StringMessage**
     - General purpose String container (message).
- - **HighScoreForm**
-    - Limit the number of high scores returned (number_of_results).
  - **RankingForm**
     - Used for user ranking and high scores (user_name, score).
  - **RankingForm**
