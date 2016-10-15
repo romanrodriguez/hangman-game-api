@@ -114,6 +114,7 @@ class HangmanGameApi(remote.Service):
             raise endpoints.ForbiddenException('Already said that letter.')
         if request.guess == game.guess_word:
             game.end_game(True)
+            game.history.append(("Word Guessed.", "Game Won."))
             return game.to_form('You guessed the word! You win!')
         elif len(request.guess) != 1:
             raise endpoints.ForbiddenException(
@@ -124,17 +125,19 @@ class HangmanGameApi(remote.Service):
         if request.guess not in game.guess_word:
             game.attempts_remaining -= 1
             game.letter_attempts_wrong += request.guess
-            game.history.append((request.guess, "not found"))
+            game.history.append(("Guess:", request.guess, "Wrong gGess"))
             msg = 'Your letter is NOT in the word.'
         if request.guess in game.guess_word:
             game.letter_attempts_correct += request.guess
-            game.history.append((request.guess, "found"))
+            game.history.append(("Guess:", request.guess, "Correct Guess"))
             msg = 'Your letter is in the word. Keep going.'
         if game.guess_word in game.letter_attempts_correct:
             game.end_game(True)
+            game.history.append(("Word guessed.", "Game Won."))
             return game.to_form('You guessed the word! You win!')
-        if game.attempts_remaining == 0:
+        if game.attempts_remaining < 1:
             game.end_game()
+            game.history.append(("No Attempts Left.", "Game Over."))
             return game.to_form(msg + ' Game over!')
         else:
             game.put()
