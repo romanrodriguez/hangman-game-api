@@ -218,7 +218,7 @@ class HangmanGameApi(remote.Service):
                       http_method='GET')
     def get_high_scores(self, request):
         """Return scores from highest - limits nr. of results to 10"""
-        Scores = Score.query(Score.won == True).order(Score.guesses).fetch(
+        Scores = Score.query(Score.won == True).order(-Score.guesses).fetch(
             request.results)[0:request.number_of_results]
         return ScoreForms(items=[score.to_form() for score in Scores])
 
