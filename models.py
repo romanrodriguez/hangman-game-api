@@ -142,11 +142,6 @@ class StringMessage(messages.Message):
     message = messages.StringField(1, required=True)
 
 
-class HighScoreForm(messages.Message):
-    """Limit the number of high scores returned"""
-    number_of_results = messages.IntegerField(1, default=10)
-
-
 class RankingForm(messages.Message):
     """Used for user ranking and high scores"""
     user_name = messages.StringField(1, required=True)
