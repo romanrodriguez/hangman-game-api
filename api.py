@@ -1,6 +1,5 @@
 """Hangman API built on Google Cloud Endpoints."""
 
-import re
 import endpoints
 from protorpc import remote, messages
 from google.appengine.api import (
