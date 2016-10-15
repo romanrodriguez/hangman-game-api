@@ -59,16 +59,7 @@ class HangmanGameApi(remote.Service):
             raise endpoints.ConflictException(
                 'A User with that name already exists!')
         user = User(name=request.user_name, email=request.email)
-        """
-        Use regex to check email validity.
-        Could add sending activation emails instead, as it is common practice
-        and a more secure and standard way nowadays.
-        """
-        match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]'
-                         '+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', request.email)
-        if match is None:
-            raise endpoints.ConflictException(
-                'Not a valid email! Please enter a correct email address.')
+        # Could add sending activation emails for login
         user.put()
         return StringMessage(message='User {} created!'.format(
             request.user_name))
