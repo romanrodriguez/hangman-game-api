@@ -103,32 +103,34 @@ class HangmanGameApi(remote.Service):
                 'You can only type alphabetic characters.')
         if request.guess in game.letter_attempts:
             raise endpoints.ForbiddenException('Already said that letter.')
-        if request.guess == game.guess_word:
-            game.end_game(True)
-            game.history.append(("Word Guessed.", "Game Won."))
-            return game.to_form('You guessed the word! You win!')
-        elif len(request.guess) != 1:
-            raise endpoints.ForbiddenException(
-                'Only provide one letter at a time or the entire exact word.')
+        if len(request.guess) > game.guess_word:
+            if request.guess == game.guess_word:
+                game.history.append(("Word Guessed.", "Game Won."))
+                game.end_game(True)
+                return game.to_form('You guessed the word! You win!')
+            else:
+                game.attempts_remaining -= 1
+                raise endpoints.ForbiddenException(
+                    'Thar was not the word we are looking for.')
 
         game.letter_attempts += request.guess
 
         if request.guess not in game.guess_word:
             game.attempts_remaining -= 1
             game.letter_attempts_wrong += request.guess
-            game.history.append(("Guess:", request.guess, "Wrong gGess"))
+            game.history.append(("Guess:", request.guess, "Wrong Guess"))
             msg = 'Your letter is NOT in the word.'
         if request.guess in game.guess_word:
             game.letter_attempts_correct += request.guess
             game.history.append(("Guess:", request.guess, "Correct Guess"))
             msg = 'Your letter is in the word. Keep going.'
         if game.guess_word in game.letter_attempts_correct:
-            game.end_game(True)
             game.history.append(("Word guessed.", "Game Won."))
+            game.end_game(True)
             return game.to_form('You guessed the word! You win!')
         if game.attempts_remaining < 1:
-            game.end_game()
             game.history.append(("No Attempts Left.", "Game Over."))
+            game.end_game()
             return game.to_form(msg + ' Game over!')
         else:
             game.put()
